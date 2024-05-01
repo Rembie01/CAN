@@ -7,7 +7,7 @@ import numpy as np
 from tensorboardX import SummaryWriter
 
 from utils import load_config, save_checkpoint, load_checkpoint
-from dataset import get_crohme_dataset
+from dataset import get_mlhme_dataset
 from models.can import CAN
 from training import train, eval
 
@@ -21,7 +21,7 @@ if not args.dataset:
     exit(-1)
 
 if args.dataset == 'CROHME':
-    config_file = 'config.yaml'
+    config_file = 'config mlhme.yaml'
 
 """加载config文件"""
 params = load_config(config_file)
@@ -37,7 +37,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 params['device'] = device
 
 if args.dataset == 'CROHME':
-    train_loader, eval_loader = get_crohme_dataset(params)
+    train_loader, eval_loader = get_mlhme_dataset(params)
 
 model = CAN(params)
 now = time.strftime("%Y-%m-%d-%H-%M", time.localtime())
