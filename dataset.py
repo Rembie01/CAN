@@ -2,6 +2,9 @@ import torch
 import time
 import pickle as pkl
 from torch.utils.data import DataLoader, Dataset, RandomSampler
+from PIL import Image
+from pathlib import Path
+from torchvision.transforms.functional import to_tensor
 
 
 class HMERDataset(Dataset):
@@ -47,6 +50,38 @@ class HMERDataset(Dataset):
         return image, words
 
 
+class MLHMEDataset(Dataset):
+    def __init__(self, params, train_labels_path, words, is_train=True):
+        self.is_train = is_train
+        self.params = params
+        self.words = words
+        self.image_paths = []
+        self.image_labels = []
+        self.image_root = Path(train_labels_path).parent / 'train_images'
+
+        with open(train_labels_path, 'r', encoding='utf8') as f:
+            lines = f.readlines()
+        
+        for line in lines:
+            image_name, *labels = line.strip().split()
+            labels.append('eos')
+            self.image_paths.append(self.image_root / image_name)
+            self.image_labels.append(labels)
+
+    def __len__(self):
+        assert len(self.image_paths) == len(self.image_labels)
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        image_path, labels = self.image_paths[idx], self.image_labels[idx]
+        im = Image.open(image_path)
+        img = to_tensor(im)
+        img = 1 - img
+        words = self.words.encode(labels)
+        words = torch.LongTensor(words)
+        return img, words
+
+
 def get_crohme_dataset(params):
     words = Words(params['word_path'])
     params['word_num'] = len(words)
@@ -55,6 +90,28 @@ def get_crohme_dataset(params):
 
     train_dataset = HMERDataset(params, params['train_image_path'], params['train_label_path'], words, is_train=True)
     eval_dataset = HMERDataset(params, params['eval_image_path'], params['eval_label_path'], words, is_train=False)
+
+    train_sampler = RandomSampler(train_dataset)
+    eval_sampler = RandomSampler(eval_dataset)
+
+    train_loader = DataLoader(train_dataset, batch_size=params['batch_size'], sampler=train_sampler,
+                              num_workers=params['workers'], collate_fn=collate_fn_dict[params['collate_fn']], pin_memory=True)
+    eval_loader = DataLoader(eval_dataset, batch_size=1, sampler=eval_sampler,
+                              num_workers=params['workers'], collate_fn=collate_fn_dict[params['collate_fn']], pin_memory=True)
+
+    print(f'train dataset: {len(train_dataset)} train steps: {len(train_loader)} '
+          f'eval dataset: {len(eval_dataset)} eval steps: {len(eval_loader)} ')
+    return train_loader, eval_loader
+
+
+def get_mlhme_dataset(params):
+    words = Words(params['word_path'])
+    params['word_num'] = len(words)
+    print(f"训练数据路径 images: {params['train_image_path']} labels: {params['train_label_path']}")
+    print(f"验证数据路径 images: {params['eval_image_path']} labels: {params['eval_label_path']}")
+
+    train_dataset = MLHMEDataset(params, params['train_label_path'], words, is_train=True)
+    eval_dataset = MLHMEDataset(params, params['eval_label_path'], words, is_train=False)
 
     train_sampler = RandomSampler(train_dataset)
     eval_sampler = RandomSampler(eval_dataset)
@@ -96,9 +153,8 @@ def collate_fn(batch_images):
 
 class Words:
     def __init__(self, words_path):
-        with open(words_path) as f:
+        with open(words_path, encoding='utf8') as f:
             words = f.readlines()
-            print(f'共 {len(words)} 类符号。')
         self.words_dict = {words[i].strip(): i for i in range(len(words))}
         self.words_index_dict = {i: words[i].strip() for i in range(len(words))}
 
