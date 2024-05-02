@@ -1,13 +1,13 @@
-# 实验名称
+# name
 experiment: "CAN"
 
-# 随机种子
+# seed
 seed: 20211024
 
-# 训练参数
+# train params
 epochs: 1
 batch_size: 8
-workers: 0
+workers: 1
 train_parts: 1
 valid_parts: 1
 valid_start: 0
@@ -29,7 +29,7 @@ gradient: 100
 gradient_clip: True
 use_label_mask: False
 
-# 训练数据
+# datapaths
 train_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\MLHME-38K\train_set\train_labels copy.txt'
 train_image_path: 'NA'
 
@@ -58,6 +58,7 @@ decoder:
   input_size: 256
   hidden_size: 256
 
+# out_channel should be equal to the amount of symbols in the dictionary
 counting_decoder:
   in_channel: 684
   out_channel: 207

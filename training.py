@@ -41,7 +41,7 @@ def train(params, model, optimizer, epoch, train_loader, writer=None):
                 writer.add_scalar('train/ExpRate', ExpRate, current_step)
                 writer.add_scalar('train/lr', optimizer.param_groups[0]['lr'], current_step)
 
-            pbar.set_description(f'{epoch+1} word_loss:{word_loss.item():.4f} counting_loss:{counting_loss.item():.4f} WRate:{word_right / length:.4f} '
+            pbar.set_description(f'(Train {epoch+1}) word_loss:{word_loss.item():.4f} counting_loss:{counting_loss.item():.4f} WRate:{word_right / length:.4f} '
                                  f'ERate:{exp_right / cal_num:.4f}')
             if batch_idx >= len(train_loader) // params['train_parts']:
                 break
@@ -82,7 +82,7 @@ def eval(params, model, epoch, eval_loader, writer=None):
                 writer.add_scalar('eval/WordRate', wordRate, current_step)
                 writer.add_scalar('eval/ExpRate', ExpRate, current_step)
 
-            pbar.set_description(f'{epoch+1} word_loss:{word_loss.item():.4f} counting_loss:{counting_loss.item():.4f} WRate:{word_right / length:.4f} '
+            pbar.set_description(f'(Eval {epoch+1}) word_loss:{word_loss.item():.4f} counting_loss:{counting_loss.item():.4f} WRate:{word_right / length:.4f} '
                                  f'ERate:{exp_right / cal_num:.4f}')
             if batch_idx >= len(eval_loader) // params['valid_parts']:
                 break

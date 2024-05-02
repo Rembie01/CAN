@@ -76,6 +76,7 @@ class MLHMEDataset(Dataset):
         image_path, labels = self.image_paths[idx], self.image_labels[idx]
         im = Image.open(image_path).convert('L')
         img = to_tensor(im)
+        im.close()
         img = 1 - img
         words = self.words.encode(labels)
         words = torch.LongTensor(words)
@@ -107,8 +108,8 @@ def get_crohme_dataset(params):
 def get_mlhme_dataset(params):
     words = Words(params['word_path'])
     params['word_num'] = len(words)
-    print(f"labels: {params['train_label_path']}")
-    print(f"labels: {params['eval_label_path']}")
+    print(f"Train labels: {params['train_label_path']}")
+    print(f"Eval labels: {params['eval_label_path']}")
 
     train_dataset = MLHMEDataset(params, params['train_label_path'], words, is_train=True)
     eval_dataset = MLHMEDataset(params, params['eval_label_path'], words, is_train=False)
@@ -121,14 +122,14 @@ def get_mlhme_dataset(params):
     eval_loader = DataLoader(eval_dataset, batch_size=1, sampler=eval_sampler,
                               num_workers=params['workers'], collate_fn=collate_fn_dict[params['collate_fn']], pin_memory=True)
 
-    print(f'train dataset: {len(train_dataset)} train steps: {len(train_loader)} '
-          f'eval dataset: {len(eval_dataset)} eval steps: {len(eval_loader)} ')
+    print(f'Train dataset: {len(train_dataset)}, Train steps: {len(train_loader)} \n'
+          f'Eval dataset: {len(eval_dataset)}, Eval steps: {len(eval_loader)}')
     return train_loader, eval_loader
 
 
 def collate_fn(batch_images):
     max_width, max_height, max_length = 0, 0, 0
-    batch, channel = len(batch_images), batch_images[0][0].shape[0]
+    _, channel = len(batch_images), batch_images[0][0].shape[0]
     proper_items = []
     for item in batch_images:
         if item[0].shape[1] * max_width > 1600 * 320 or item[0].shape[2] * max_height > 1600 * 320:
