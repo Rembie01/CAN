@@ -17,7 +17,7 @@ parser.add_argument('--check', action='store_true', help='测试代码选项')
 args = parser.parse_args()
 
 if not args.dataset:
-    print('请提供数据集名称')
+    print('No dataset specified')
     exit(-1)
 
 if args.dataset == 'CROHME':
@@ -26,10 +26,10 @@ if args.dataset == 'CROHME':
 if args.dataset == 'MLHME':
     config_file = 'config mlhme.yaml'
 
-"""加载config文件"""
+"""Config"""
 params = load_config(config_file)
 
-"""设置随机种子"""
+"""Seed"""
 random.seed(params['seed'])
 np.random.seed(params['seed'])
 torch.manual_seed(params['seed'])
@@ -61,8 +61,8 @@ optimizer = getattr(torch.optim, params['optimizer'])(model.parameters(), lr=flo
                                                       eps=float(params['eps']), weight_decay=float(params['weight_decay']))
 
 if params['finetune']:
-    print('加载预训练模型权重')
-    print(f'预训练权重路径: {params["checkpoint"]}')
+    print('Finetuning')
+    print(f'Loading model: {params["checkpoint"]}')
     load_checkpoint(model, optimizer, params['checkpoint'])
 
 if not args.check:
@@ -70,8 +70,8 @@ if not args.check:
         os.makedirs(os.path.join(params['checkpoint_dir'], model.name), exist_ok=True)
     os.system(f'cp {config_file} {os.path.join(params["checkpoint_dir"], model.name, model.name)}.yaml')
 
-"""在CROHME上训练"""
-if args.dataset == 'CROHME':
+# Train
+if args.dataset == 'CROHME' or args.dataset == 'MLHME':
     min_score, init_epoch = 0, 0
 
     for epoch in range(init_epoch, params['epochs']):
@@ -85,17 +85,3 @@ if args.dataset == 'CROHME':
                 save_checkpoint(model, optimizer, eval_word_score, eval_exprate, epoch+1,
                                 optimizer_save=params['optimizer_save'], path=params['checkpoint_dir'])
 
-
-if args.dataset == 'MLHME':
-    min_score, init_epoch = 0, 0
-
-    for epoch in range(init_epoch, params['epochs']):
-        train_loss, train_word_score, train_exprate = train(params, model, optimizer, epoch, train_loader, writer=writer)
-
-        if epoch >= params['valid_start']:
-            eval_loss, eval_word_score, eval_exprate = eval(params, model, epoch, eval_loader, writer=writer)
-            print(f'Epoch: {epoch+1} loss: {eval_loss:.4f} word score: {eval_word_score:.4f} ExpRate: {eval_exprate:.4f}')
-            if eval_exprate > min_score and not args.check and epoch >= params['save_start']:
-                min_score = eval_exprate
-                save_checkpoint(model, optimizer, eval_word_score, eval_exprate, epoch+1,
-                                optimizer_save=params['optimizer_save'], path=params['checkpoint_dir'])

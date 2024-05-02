@@ -5,7 +5,7 @@ experiment: "CAN"
 seed: 20211024
 
 # 训练参数
-epochs: 240
+epochs: 1
 batch_size: 8
 workers: 0
 train_parts: 1
@@ -30,11 +30,13 @@ gradient_clip: True
 use_label_mask: False
 
 # 训练数据
-train_label_path: r'C:\Users\rembe\Downloads\MLHME-38K\train_set'
+train_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\MLHME-38K\train_set\train_labels copy.txt'
+train_image_path: 'NA'
 
-eval_label_path: r'C:\Users\rembe\Downloads\MLHME-38K\train_set'
+eval_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\MLHME-38K\train_set\train_labels copy.txt'
+eval_image_path: 'NA'
 
-word_path: r'C:\Users\rembe\Downloads\MLHME-38K\train_set\words.txt'
+word_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\words.txt'
 
 # collate_fn
 collate_fn: collate_fn
@@ -58,7 +60,7 @@ decoder:
 
 counting_decoder:
   in_channel: 684
-  out_channel: 111
+  out_channel: 207
 
 attention:
   attention_dim: 512

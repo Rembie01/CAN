@@ -12,7 +12,7 @@ def load_config(yaml_path):
         with open(yaml_path, 'r') as f:
             params = yaml.load(f, Loader=yaml.FullLoader)
     except:
-        print('尝试UTF-8编码....')
+        print('Opening yaml....')
         with open(yaml_path, 'r', encoding='UTF-8') as f:
             params = yaml.load(f, Loader=yaml.FullLoader)
     if not params['experiment']:

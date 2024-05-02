@@ -6,15 +6,15 @@ import matplotlib.pyplot as plt
 import os
 
 def gen_counting_label(labels, channel, tag):
-    b, t = labels.size()
+    batch_size, labels_lenght = labels.size()
     device = labels.device
-    counting_labels = torch.zeros((b, channel))
+    counting_labels = torch.zeros((batch_size, channel))
     if tag:
-        ignore = [0, 1, 107, 108, 109, 110]
+        ignore = [0]
     else:
         ignore = []
-    for i in range(b):
-        for j in range(t):
+    for i in range(batch_size):
+        for j in range(labels_lenght):
             k = labels[i][j]
             if k in ignore:
                 continue

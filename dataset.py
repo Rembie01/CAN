@@ -74,7 +74,7 @@ class MLHMEDataset(Dataset):
 
     def __getitem__(self, idx):
         image_path, labels = self.image_paths[idx], self.image_labels[idx]
-        im = Image.open(image_path)
+        im = Image.open(image_path).convert('L')
         img = to_tensor(im)
         img = 1 - img
         words = self.words.encode(labels)
@@ -107,8 +107,8 @@ def get_crohme_dataset(params):
 def get_mlhme_dataset(params):
     words = Words(params['word_path'])
     params['word_num'] = len(words)
-    print(f"训练数据路径 images: {params['train_image_path']} labels: {params['train_label_path']}")
-    print(f"验证数据路径 images: {params['eval_image_path']} labels: {params['eval_label_path']}")
+    print(f"labels: {params['train_label_path']}")
+    print(f"labels: {params['eval_label_path']}")
 
     train_dataset = MLHMEDataset(params, params['train_label_path'], words, is_train=True)
     eval_dataset = MLHMEDataset(params, params['eval_label_path'], words, is_train=False)
