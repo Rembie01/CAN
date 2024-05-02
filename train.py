@@ -79,6 +79,8 @@ if __name__ == '__main__':
     if args.dataset == 'CROHME' or args.dataset == 'MLHME':
         best_score, init_epoch = -1, 0
 
+        print('Start training')
+
         for epoch in range(init_epoch, params['epochs']):
             train_loss, train_word_score, train_exprate = train(params, model, optimizer, epoch, train_loader, writer=writer)
 
