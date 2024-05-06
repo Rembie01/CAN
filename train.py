@@ -42,6 +42,8 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     params['device'] = device
 
+    print('Using', device)
+
     if args.dataset == 'CROHME':
         train_loader, eval_loader = get_crohme_dataset(params)
 
