@@ -11,12 +11,10 @@ from dataset import get_mlhme_dataset, get_crohme_dataset
 from models.can import CAN
 from training import train, eval
 
-path = 'C:/Users/REM/OneDrive - Televic Group NV/Documents/CAN_test'
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='model training')
-    parser.add_argument('--dataset', default='CROHME', type=str, help='数据集名称')
-    parser.add_argument('--no_check', action='store_true', help='测试代码选项')
+    parser.add_argument('--dataset', default='CROHME', type=str, help='the dataset to run the model on, dataloaders work depending on the specific dataset')
+    parser.add_argument('--no_check', action='store_true', help='if true, does not store checkpoints')
     args = parser.parse_args()
 
     if not args.dataset:
@@ -26,9 +24,16 @@ if __name__ == '__main__':
     if args.dataset == 'CROHME':
         config_file = 'config.yaml'
 
-    if args.dataset == 'MLHME':
+    elif args.dataset == 'MLHME':
         config_file = 'config_mlhme.yaml'
-
+    
+    elif args.dataset =='MLHMED':
+        config_file = 'config_mlhme_desktop.yaml'
+    
+    else:
+        print('Dataset not recognized')
+        exit(-1)
+    
     """Config"""
     params = load_config(config_file)
 
@@ -71,11 +76,17 @@ if __name__ == '__main__':
         load_checkpoint(model, optimizer, params['checkpoint'])
 
     if not args.no_check:
+        from sys import platform
         if not os.path.exists(os.path.join(params['checkpoint_dir'], model.name)):
             os.makedirs(os.path.join(params['checkpoint_dir'], model.name), exist_ok=True)
         
         print('Copying config to checkpoints...')
-        os.system(f'copy {config_file} {os.path.join(params["checkpoint_dir"], model.name, model.name)}.yaml')
+        if platform == "linux" or platform == "linux2":
+            os.system(f'cp {config_file} {os.path.join(params["checkpoint_dir"], model.name, model.name)}.yaml')
+        elif platform == "win32":
+            os.system(f'copy {config_file} {os.path.join(params["checkpoint_dir"], model.name, model.name)}.yaml')
+        else:
+            print('Could not copy config')
 
     # Train
     if args.dataset == 'CROHME' or args.dataset == 'MLHME':
