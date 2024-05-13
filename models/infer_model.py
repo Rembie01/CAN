@@ -28,7 +28,6 @@ class Inference(nn.Module):
         self.device = params['device']
         self.decoder = decoder_dict[params['decoder']['net']](params=self.params)
 
-        """经过cnn后 长宽与原始尺寸比缩小的比例"""
         self.ratio = params['densenet']['ratio']
 
         with open(params['word_path']) as f:
