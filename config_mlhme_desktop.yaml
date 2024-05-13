@@ -5,7 +5,7 @@ experiment: "CAN"
 seed: 20211024
 
 # train params
-epochs: 1
+epochs: 240
 batch_size: 4
 workers: 1
 train_parts: 1
