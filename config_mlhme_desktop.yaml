@@ -5,7 +5,7 @@ experiment: "CAN"
 seed: 20211024
 
 # train params
-epochs: 240
+epochs: 50
 batch_size: 4
 workers: 1
 train_parts: 1
@@ -30,13 +30,13 @@ gradient_clip: True
 use_label_mask: False
 
 # datapaths
-train_label_path: 'D:\Masterproef\CAN\MLHME-38K\train_set\train_labels.txt'
+train_label_path: 'D:\Masterproef\CAN\MLHME-38K\train_set\train.txt'
 train_image_path: 'NA'
 
-eval_label_path: 'D:\Masterproef\CAN\MLHME-38K\train_set\train_labels.txt'
+eval_label_path: 'D:\Masterproef\CAN\MLHME-38K\train_set\val.txt'
 eval_image_path: 'NA'
 
-word_path: 'D:\Masterproef\CAN\words.txt'
+word_path: 'D:\Masterproef\CAN\MLHME-38K\train_set\words.txt'
 
 # collate_fn
 collate_fn: collate_fn

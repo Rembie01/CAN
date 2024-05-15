@@ -52,7 +52,7 @@ if __name__ == '__main__':
     if args.dataset == 'CROHME':
         train_loader, eval_loader = get_crohme_dataset(params)
 
-    if args.dataset == 'MLHME':
+    if args.dataset == 'MLHME' or args.dataset == 'MLHMED':
         train_loader, eval_loader = get_mlhme_dataset(params)
 
     model = CAN(params)
@@ -89,8 +89,8 @@ if __name__ == '__main__':
             print('Could not copy config')
 
     # Train
-    if args.dataset == 'CROHME' or args.dataset == 'MLHME':
-        best_score, init_epoch = -1, 0
+    if args.dataset == 'CROHME' or args.dataset == 'MLHME' or args.dataset == 'MLHMED':
+        best_score, init_epoch = 0, 0
 
         print('Start training')
 
