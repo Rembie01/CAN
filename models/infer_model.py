@@ -30,9 +30,9 @@ class Inference(nn.Module):
 
         self.ratio = params['densenet']['ratio']
 
-        with open(params['word_path']) as f:
+        with open(params['word_path'], 'r', encoding='utf8') as f:
             words = f.readlines()
-            print(f'共 {len(words)} 类符号。')
+            print(f'Dictionary: {len(words)} symbols')
         self.words_index_dict = {i: words[i].strip() for i in range(len(words))}
         self.cal_mae = nn.L1Loss(reduction='mean')
         self.cal_mse = nn.MSELoss(reduction='mean') 

@@ -36,6 +36,9 @@ train_image_path: 'NA'
 eval_label_path: 'D:\Masterproef\CAN\MLHME-38K\train_set\val.txt'
 eval_image_path: 'NA'
 
+test_label_path: 'D:\Masterproef\CAN\MLHME-38K\train_set\test.txt'
+test_image_path: 'NA'
+
 word_path: 'D:\Masterproef\CAN\MLHME-38K\train_set\words.txt'
 
 # collate_fn
@@ -76,5 +79,5 @@ max_step: 256
 optimizer_save: False
 finetune: False
 checkpoint_dir: 'checkpoints'
-checkpoint: ""
+checkpoint: 'D:\Masterproef\CAN\checkpoints\CAN_2024-05-29-11-51_decoder-AttDecoder\CAN_2024-05-29-11-51_decoder-AttDecoder_WordRate-0.0000_ExpRate-0.0000_1.pth'
 log_dir: 'logs'

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import os
 
 def gen_counting_label(labels, channel, tag):
+    labels = labels.flatten(1)
     batch_size, labels_lenght = labels.size()
     device = labels.device
     counting_labels = torch.zeros((batch_size, channel))

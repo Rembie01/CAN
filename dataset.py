@@ -51,8 +51,9 @@ class HMERDataset(Dataset):
 
 
 class MLHMEDataset(Dataset):
-    def __init__(self, params, train_labels_path, words, is_train=True):
+    def __init__(self, params, train_labels_path, words, is_train=True, is_test=False):
         self.is_train = is_train
+        self.is_test = is_test
         self.params = params
         self.words = words
         self.image_paths = []
@@ -80,7 +81,10 @@ class MLHMEDataset(Dataset):
         img = 1 - img
         words = self.words.encode(labels)
         words = torch.LongTensor(words)
-        return img, words
+        if self.is_test:
+            return img, words, image_path
+        else:
+            return img, words
 
 
 def get_crohme_dataset(params):

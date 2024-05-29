@@ -22,7 +22,6 @@ class CAN(nn.Module):
         self.cross = nn.CrossEntropyLoss(reduction='none') if self.use_label_mask else nn.CrossEntropyLoss()
         self.counting_loss = nn.SmoothL1Loss(reduction='mean')
 
-        """经过cnn后 长宽与原始尺寸比缩小的比例"""
         self.ratio = params['densenet']['ratio']
 
     def forward(self, images, images_mask, labels, labels_mask, is_train=True):

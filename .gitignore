@@ -2,3 +2,5 @@ __pycache__
 MLHME-38K
 checkpoints
 logs
+/vis
+AttDecoder_bad_case.json
