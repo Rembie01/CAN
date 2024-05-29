@@ -89,8 +89,6 @@ if __name__ == '__main__':
             img = image.to(device)
             a = time.time()
             
-            #input_labels = words.encode(input_labels[0])
-            #input_labels = torch.LongTensor(input_labels)
             input_labels = input_labels.unsqueeze(0).to(device)
 
             probs, _, mae, mse = model(img, input_labels, os.path.join(params['decoder']['net'], name))

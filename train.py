@@ -50,10 +50,10 @@ if __name__ == '__main__':
     print('Using', device)
 
     if args.dataset == 'CROHME':
-        train_loader, eval_loader = get_crohme_dataset(params)
+        train_loader, eval_loader, params = get_crohme_dataset(params)
 
     if args.dataset == 'MLHME' or args.dataset == 'MLHMED':
-        train_loader, eval_loader = get_mlhme_dataset(params)
+        train_loader, eval_loader, params = get_mlhme_dataset(params)
 
     model = CAN(params)
     now = time.strftime("%Y-%m-%d-%H-%M", time.localtime())

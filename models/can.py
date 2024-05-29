@@ -15,7 +15,7 @@ class CAN(nn.Module):
         self.use_label_mask = params['use_label_mask']
         self.encoder = DenseNet(params=self.params)
         self.in_channel = params['counting_decoder']['in_channel']
-        self.out_channel = params['counting_decoder']['out_channel']
+        self.out_channel = params['word_num']
         self.counting_decoder1 = counting_decoder(self.in_channel, self.out_channel, 3)
         self.counting_decoder2 = counting_decoder(self.in_channel, self.out_channel, 5)
         self.decoder = getattr(models, params['decoder']['net'])(params=self.params)

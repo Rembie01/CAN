@@ -106,7 +106,7 @@ def get_crohme_dataset(params):
 
     print(f'train dataset: {len(train_dataset)} train steps: {len(train_loader)} '
           f'eval dataset: {len(eval_dataset)} eval steps: {len(eval_loader)} ')
-    return train_loader, eval_loader
+    return train_loader, eval_loader, params
 
 
 def get_mlhme_dataset(params):
@@ -128,7 +128,7 @@ def get_mlhme_dataset(params):
 
     print(f'Train dataset: {len(train_dataset)}, Train steps: {len(train_loader)} \n'
           f'Eval dataset: {len(eval_dataset)}, Eval steps: {len(eval_loader)}')
-    return train_loader, eval_loader
+    return train_loader, eval_loader, params
 
 
 def collate_fn(batch_images):

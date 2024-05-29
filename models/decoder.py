@@ -54,7 +54,6 @@ class AttDecoder(nn.Module):
         self.word_num = params['word_num']
         self.counting_num = params['counting_decoder']['out_channel']
 
-        """经过cnn后 长宽与原始尺寸比缩小的比例"""
         self.ratio = params['densenet']['ratio']
 
         # init hidden state
