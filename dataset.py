@@ -51,16 +51,15 @@ class HMERDataset(Dataset):
 
 
 class MLHMEDataset(Dataset):
-    def __init__(self, params, train_labels_path, words, is_train=True, is_test=False):
+    def __init__(self, params, labels_path, words, is_train=True):
         self.is_train = is_train
-        self.is_test = is_test
         self.params = params
         self.words = words
         self.image_paths = []
         self.image_labels = []
-        self.image_root = Path(train_labels_path).parent / 'train_images'
+        self.image_root = Path(labels_path).parent / 'train_images'
 
-        with open(train_labels_path, 'r', encoding='utf8') as f:
+        with open(labels_path, 'r', encoding='utf8') as f:
             lines = f.readlines()
         
         for line in lines:
@@ -81,10 +80,7 @@ class MLHMEDataset(Dataset):
         img = 1 - img
         words = self.words.encode(labels)
         words = torch.LongTensor(words)
-        if self.is_test:
-            return img, words, image_path
-        else:
-            return img, words
+        return img, words
 
 
 def get_crohme_dataset(params):

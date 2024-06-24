@@ -79,5 +79,5 @@ max_step: 256
 optimizer_save: False
 finetune: False
 checkpoint_dir: 'checkpoints'
-checkpoint: 'D:\Masterproef\CAN\checkpoints\CAN_2024-05-29-11-51_decoder-AttDecoder\CAN_2024-05-29-11-51_decoder-AttDecoder_WordRate-0.0000_ExpRate-0.0000_1.pth'
+checkpoint: 'D:\Masterproef\CAN\checkpoints\CAN_2024-05-29-13-47_decoder-AttDecoder\CAN_2024-05-29-13-47_decoder-AttDecoder_WordRate-0.9196_ExpRate-0.4780_30.pth'
 log_dir: 'logs'

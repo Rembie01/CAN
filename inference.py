@@ -26,10 +26,7 @@ if __name__ == '__main__':
         print('No dataset specified')
         exit(-1)
 
-    if args.dataset == 'CROHME':
-        config_file = 'config.yaml'
-    
-    elif args.dataset == 'MLHME':
+    if args.dataset == 'MLHME':
         config_file = 'config_mlhme_test.yaml'
 
     elif args.dataset =='MLHMED':
@@ -57,17 +54,10 @@ if __name__ == '__main__':
 
     load_checkpoint(model, None, params['checkpoint'])
     model.eval()
-
-    if args.dataset == 'CROHME':
-        with open(args.image_path, 'rb') as f:
-            images = pkl.load(f)
-
-        with open(args.label_path) as f:
-            lines = f.readlines()
     
-    elif args.dataset == 'MLHME' or args.dataset =='MLHMED':
+    if args.dataset == 'MLHME' or args.dataset =='MLHMED':
         words = Words(params['word_path'])
-        test_dataset = MLHMEDataset(params, params['test_label_path'], words, is_train=False, is_test=False)
+        test_dataset = MLHMEDataset(params, params['test_label_path'], words, is_train=False)
         test_loader = DataLoader(test_dataset, batch_size=1)
     
     else:
@@ -83,6 +73,7 @@ if __name__ == '__main__':
     with tqdm(test_loader) as pbar, torch.no_grad():
         for idx, (image, label) in enumerate(pbar):
             input_labels = label
+            # print(input_labels.tolist()[0])
             labels = ' '.join(str(label.tolist()[0]))
             name = str(idx)
             name = name.split('.')[0] if name.endswith('jpg') else name
@@ -97,16 +88,18 @@ if __name__ == '__main__':
             model_time += (time.time() - a)
 
             prediction = words.decode(probs)
-            if prediction == labels:
+            ground_truth = input_labels[0][0][:-1]
+            ground_truth = words.decode(input_labels[0][0][:-1]) #remove the last element (eos token)
+            if prediction == ground_truth:
                 line_right += 1
             else:
                 bad_case[name] = {
-                    'label': labels,
+                    'label': ground_truth,
                     'predi': prediction
                 }
                 # print(name, prediction, labels)
 
-            distance = compute_edit_distance(prediction, labels)
+            distance = compute_edit_distance(prediction, ground_truth)
             if distance <= 1:
                 e1 += 1
             if distance <= 2:
@@ -122,5 +115,5 @@ if __name__ == '__main__':
     print(f'e2: {e2 / len(test_loader)}')
     print(f'e3: {e3 / len(test_loader)}')
 
-    with open(f'{params["decoder"]["net"]}_bad_case.json','w') as f:
+    with open(f'{params["decoder"]["net"]}_bad_case.json','w', encoding='utf-8') as f:
         json.dump(bad_case,f,ensure_ascii=False)
