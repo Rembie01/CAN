@@ -5,7 +5,7 @@ experiment: "CAN"
 seed: 20211024
 
 # train params
-epochs: 1
+epochs: 20
 batch_size: 4
 workers: 1
 train_parts: 1
@@ -36,7 +36,7 @@ train_image_path: 'NA'
 eval_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\MLHME-38K\train_set\train_labels_subset.txt'
 eval_image_path: 'NA'
 
-word_path: 'D:\Masterproef\CAN\words.txt'
+word_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\words.txt'
 
 # collate_fn
 collate_fn: collate_fn
