@@ -55,12 +55,13 @@ class HMERDataset(Dataset):
 
 class MLHMEDataset(Dataset):
     # als istrain = true, append eos, anders niet
-    def __init__(self, params, labels_path, words):
+    def __init__(self, params, labels_path, words, debug=False):
         self.params = params
         self.words = words
         self.image_paths = []
         self.image_labels = []
         self.image_root = Path(labels_path).parent / 'train_images'
+        self.debug = debug
 
         with open(labels_path, 'r', encoding='utf8') as f:
             lines = f.readlines()
@@ -83,18 +84,22 @@ class MLHMEDataset(Dataset):
         img = to_tensor(im)
         im.close()
         img = 1 - img
-        words = self.words.encode(labels)
+        if self.debug:
+            words, _ = self.words.encode(labels)
+        else:
+            words = self.words.encode(labels)
         words = torch.LongTensor(words)
         return img, words
 
 
 class TelevicDataset(Dataset):
-    def __init__(self, params, json_dir, words):
+    def __init__(self, params, json_dir, words, debug=False):
         self.params = params
         self.words = words
         self.image_paths = []
         self.image_labels = []
-        self.image_root = Path(json_dir).parent / 'jpg_files'
+        self.image_root = Path(json_dir).parent / 'png_files'
+        self.debug = debug
 
         for json_file in os.listdir(json_dir):
             if json_file.endswith('.json'):
@@ -102,10 +107,11 @@ class TelevicDataset(Dataset):
                     data = json.load(file)
                     if 'latex_styled' in data:
                         self.image_labels.append(data['latex_styled'])
-                image_name = json_file.replace('.json', '.jpg')
+                image_name = json_file.replace('.json', '.png')
                 self.image_paths.append(self.image_root / image_name)
         
-        # print(str(self.image_labels[0]).replace(' ',''), self.image_paths[0])
+        if debug:
+            print(str(self.image_labels[0]).replace(' ',''), self.image_paths[0])
 
         combined_pattern = r'(\\sqrt)|(\\leftrightarrow)|(\\left\\{)|(\\left[\(\)\{\}\[\]\|.])|(\\left(\\rvert)?(\\lvert)?)|(\\right[\(\)\{\}\[\]\|.]?(\\rvert)?(\\lvert)?)|(\\text {([\w .?!,\)\()]+)})|(\\frac)|((\\[a-zA-Z]+)({[a-zA-Z~]+})?({[a-zA-Z\|]+})?)|([+-=*^_{}])|([\d\w])|(\\{2})|([\[\]\(\)\|\\&<>?!~%\"\'\&])'
 
@@ -122,6 +128,7 @@ class TelevicDataset(Dataset):
             one = ''.join(temp[i]).replace(' ', '')
             two = self.image_labels[i].replace(' ', '')
             assert one == two, f'index {i} : {self.image_paths[i]} : {one} is not equal to {two}'
+            temp[i].append('eos')
         self.image_labels = temp
 
         assert len(self.image_paths) == len(self.image_labels)
@@ -137,14 +144,25 @@ class TelevicDataset(Dataset):
 
     def __getitem__(self, idx):
         image_path, labels = self.image_paths[idx], self.image_labels[idx]
-        # print(image_path)
+        if self.debug:
+            print(image_path)
         im = Image.open(image_path).convert('L')
         img = to_tensor(im)
         im.close()
         img = 1 - img
-        words = self.words.encode(labels)
-        words = torch.LongTensor(words)
-        return img, words
+
+        # max, min = torch.max(img), torch.min(img)
+        # img  = (img-min)/(max-min) 
+
+        if self.debug:
+            words, altered = self.words.encode(labels)
+            print(f'Altered {altered}')
+            words = torch.LongTensor(words)
+            return img, words, altered
+        else:
+            words = self.words.encode(labels)
+            words = torch.LongTensor(words)
+            return img, words
 
 
 def get_crohme_dataset(params):
@@ -238,31 +256,34 @@ def collate_fn(batch_images):
 
 
 class Words:
-    def __init__(self, words_path):
+    def __init__(self, words_path, debug=False):
         with open(words_path, encoding='utf8') as f:
             words = f.readlines()
         self.words_dict = {words[i].strip(): i for i in range(len(words))}
         self.words_index_dict = {i: words[i].strip() for i in range(len(words))}
+        self.debug = debug
 
     def __len__(self):
         return len(self.words_dict)
 
     def encode(self, labels):
         label_index = []
+        altered = False
         for item in labels:
             try:
                 label_index.append(self.words_dict[item])
             except KeyError:
+                altered = True
                 if item.startswith('\\begin{array}') or item == '\\begin{aligned}':
                     label_index.append(self.words_dict['\\begin{matrix}'])
                 elif item == '\\end{array}' or item == '\\end{aligned}':
                     label_index.append(self.words_dict['\\end{matrix}'])
                 elif item.startswith('\\text'):
-                    pass
-                    print(item)
+                    if self.debug:
+                        print(item)
                 elif item.startswith('\\vec'):
-                    pass
-                    print(item)
+                    if self.debug:
+                        print(item)
                 elif item =='\\top':
                     label_index.append(self.words_dict['T'])
                 elif item == '\\quad' or item == '\\qquad' or item == '\\':
@@ -279,8 +300,8 @@ class Words:
                 elif item == '\\left.' or item == '\\right.':
                     label_index.append(self.words_dict['.'])
                 elif item.startswith('\\operatorname') or item.startswith('\\mathrm') or item == '\\operatorname{dom}' or item == '\\operatorname{asin}' or item == '\\operatorname{amplitude}' or item == '\\operatorname{dem}' or item == '\\operatorname{Nan}' or item == '\\mathrm{man}' or item == '\\operatorname{cs}' or item == '\\operatorname{sen}' or item == '\\operatorname{dam}' or item == '\\operatorname{yin}' or item == '\\operatorname{set}':
-                    pass
-                    print(item)
+                    if self.debug:
+                        print(item)
                 elif item == '&':
                     pass
                 elif item == '%':
@@ -338,7 +359,10 @@ class Words:
                     label_index.append(self.words_dict['B'])
                 else:
                     raise KeyError(f'\'{item}\' is not a key, comes from {labels}')
-        return label_index
+        if self.debug:
+            return label_index, altered
+        else:
+            return label_index
 
     def decode(self, label_index):
         label = ' '.join([self.words_index_dict[int(item)] for item in label_index])
@@ -350,22 +374,27 @@ collate_fn_dict = {
 }
 
 def test():
-    words = Words(r'D:\Masterproef\echmer\words.txt')
-    test1 = MLHMEDataset(0, r'D:\Masterproef\echmer\data\MLHME-38K\train_set\all_labels.txt', words)
-    test2 = TelevicDataset(0, r'D:\Masterproef\echmer\data\Televic\mathpix_processed_data\mathpix_output_adjusted', words)
+    words = Words(r'D:\Masterproef\echmer\words.txt', debug=True)
+    test1 = MLHMEDataset(0, r'D:\Masterproef\echmer\data\MLHME-38K\train_set\all_labels.txt', words, debug=True)
+    test2 = TelevicDataset(0, r'D:\Masterproef\echmer\data\Televic\mathpix_processed_data\mathpix_output_adjusted', words, debug=True)
 
     start_time = time.time()
-    for i in range(len(test2)):
+    for i in range(len(test1)):
         item = test1.__getitem__(i)
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"Elapsed time: {elapsed_time:.30f} seconds")
 
     start_time = time.time()
+    altered = 0
     for i in range(len(test2)):
-        im, lab = test2.__getitem__(i)
+        im, lab, alt = test2.__getitem__(i)
+        if not alt:
+            altered += 1
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"Elapsed time: {elapsed_time:.30f} seconds")
+    print(f'Altered: {altered}/{len(test2)}')
+    print(f"Elapsed time: {elapsed_time:.3f} seconds")
 
-# test()
+if __name__ == "__main__":
+    test()

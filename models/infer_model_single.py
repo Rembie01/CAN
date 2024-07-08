@@ -34,6 +34,7 @@ class Inference(nn.Module):
 
     def forward(self, images, is_train=False):
         cnn_features = self.encoder(images)
+        print('CNN features:', cnn_features.shape)
         batch_size, _, height, width = cnn_features.shape
         counting_preds1, counting_maps1 = self.counting_decoder1(cnn_features, None)
         counting_preds2, counting_maps2 = self.counting_decoder2(cnn_features, None)
@@ -89,7 +90,7 @@ class AttDecoder(nn.Module):
         word_alphas = []
 
         i = 0
-        while i < 200:
+        while i < 500:
             hidden = self.word_input_gru(word_embedding, hidden)
             word_context_vec, word_alpha, word_alpha_sum = self.word_attention(cnn_features, cnn_features_trans, hidden,
                                                                                word_alpha_sum, image_mask)

@@ -7,6 +7,7 @@ import pickle as pkl
 from tqdm import tqdm
 import time
 import numpy as np
+import matplotlib.pyplot as plt
 
 from PIL import Image
 from utils import load_config, load_checkpoint, compute_edit_distance
@@ -47,6 +48,7 @@ if __name__ == '__main__':
     img = to_tensor(im)
     im.close()
     img = 1 - img
+    plt.imshow(img.permute(1, 2, 0))
     img = img.unsqueeze(0)
     print(img.shape)
     
