@@ -34,8 +34,8 @@ class Inference(nn.Module):
 
     def forward(self, images, is_train=False):
         cnn_features = self.encoder(images)
-        print('CNN features:', cnn_features.shape)
         batch_size, _, height, width = cnn_features.shape
+        
         counting_preds1, counting_maps1 = self.counting_decoder1(cnn_features, None)
         counting_preds2, counting_maps2 = self.counting_decoder2(cnn_features, None)
         counting_preds = (counting_preds1 + counting_preds2) / 2

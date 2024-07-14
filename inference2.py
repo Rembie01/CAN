@@ -33,7 +33,7 @@ if __name__ == '__main__':
         config_file = 'config_mlhme_desktop_test.yaml'
     
     elif args.dataset =='Televic':
-        config_file = 'config_televic_desktop_test.yaml'
+        config_file = 'config_televic_desktop.yaml'
     
     else:
         print('Dataset not recognized')
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     
     elif args.dataset == 'Televic':
         words = Words(params['word_path'])
-        test_dataset = TelevicDataset(params, params['test_label_path'], words)
+        test_dataset = TelevicDataset(params, params['test_label_path'], params['question_file'], words)
         test_loader = DataLoader(test_dataset, batch_size=1)
     
     else:
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     mae_sum, mse_sum = 0, 0
     
     with tqdm(test_loader) as pbar, torch.no_grad():
-        for idx, (image, label) in enumerate(pbar):
+        for idx, (image, label, _) in enumerate(pbar):
             input_labels = label
             # print(input_labels.tolist()[0])
             labels = ' '.join(str(label.tolist()[0]))

@@ -7,7 +7,7 @@ import numpy as np
 from tensorboardX import SummaryWriter
 
 from utils import load_config, save_checkpoint, load_checkpoint
-from dataset import get_mlhme_dataset, get_crohme_dataset
+from dataset2 import get_mlhme_dataset, get_crohme_dataset, get_televic_dataset
 from models.can import CAN
 from training import train, eval
 
@@ -29,6 +29,9 @@ if __name__ == '__main__':
     
     elif args.dataset =='MLHMED':
         config_file = 'config_mlhme_desktop.yaml'
+    
+    elif args.dataset == 'Televic':
+        config_file = 'config_televic_desktop.yaml'
     
     else:
         print('Dataset not recognized')
@@ -54,6 +57,9 @@ if __name__ == '__main__':
 
     if args.dataset == 'MLHME' or args.dataset == 'MLHMED':
         train_loader, eval_loader, params = get_mlhme_dataset(params)
+    
+    if args.dataset == 'Televic':
+        train_loader, eval_loader = get_televic_dataset(params)
 
     model = CAN(params)
     now = time.strftime("%Y-%m-%d-%H-%M", time.localtime())
@@ -89,7 +95,7 @@ if __name__ == '__main__':
             print('Could not copy config')
 
     # Train
-    if args.dataset == 'CROHME' or args.dataset == 'MLHME' or args.dataset == 'MLHMED':
+    if args.dataset == 'CROHME' or args.dataset == 'MLHME' or args.dataset == 'MLHMED' or args.dataset == 'Televic':
         best_score, init_epoch = 0, 0
 
         print('Start training')
