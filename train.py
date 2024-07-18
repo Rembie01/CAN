@@ -31,7 +31,8 @@ if __name__ == '__main__':
         config_file = 'config_mlhme_desktop.yaml'
     
     elif args.dataset == 'Televic':
-        config_file = 'config_televic_desktop.yaml'
+        from dataset_televic import get_televic_dataset
+        config_file = 'config_televic_vsc.yaml'
     
     else:
         print('Dataset not recognized')
@@ -55,10 +56,10 @@ if __name__ == '__main__':
     if args.dataset == 'CROHME':
         train_loader, eval_loader, params = get_crohme_dataset(params)
 
-    if args.dataset == 'MLHME' or args.dataset == 'MLHMED':
+    elif args.dataset == 'MLHME' or args.dataset == 'MLHMED':
         train_loader, eval_loader, params = get_mlhme_dataset(params)
     
-    if args.dataset == 'Televic':
+    elif args.dataset == 'Televic':
         train_loader, eval_loader = get_televic_dataset(params)
 
     model = CAN(params)
@@ -106,7 +107,7 @@ if __name__ == '__main__':
             if epoch >= params['valid_start']:
                 eval_loss, eval_word_score, eval_exprate = eval(params, model, epoch, eval_loader, writer=writer)
                 print(f'(Epoch: {epoch+1}) loss: {eval_loss:.4f} word score: {eval_word_score:.4f} ExpRate: {eval_exprate:.4f}')
-                if eval_exprate > best_score and not args.no_check and epoch >= params['save_start']:
-                    best_score = eval_exprate
+                if (eval_exprate + eval_word_score * 0.1) > best_score and not args.no_check and epoch >= params['save_start']:
+                    best_score = eval_exprate + eval_word_score * 0.1
                     save_checkpoint(model, optimizer, eval_word_score, eval_exprate, epoch+1,
                                     optimizer_save=params['optimizer_save'], path=params['checkpoint_dir'])
