@@ -4,3 +4,5 @@ checkpoints
 logs
 /vis
 AttDecoder_bad_case.json
+test_images
+results
