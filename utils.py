@@ -105,6 +105,22 @@ def cal_score(word_probs, word_label, mask):
     word_scores = np.mean(word_scores)
     return word_scores, ExpRate
 
+def cal_score2(word_probs, word_label):
+    line_right = 0
+    if word_probs is not None:
+        _, word_pred = word_probs.max(2)
+    word_scores = [SequenceMatcher(None, s1[:int(len(s1))], s2[:int(len(s1))], autojunk=False).ratio() * (len(s1[:int(len(s1))]) + len(s2[:int(len(s1))])) / len(s1[:int(len(s1))]) / 2
+              for s1, s2 in zip(word_label.cpu().detach().numpy(), word_pred.cpu().detach().numpy())]
+    
+    batch_size = len(word_scores)
+    for i in range(batch_size):
+        if word_scores[i] == 1:
+            line_right += 1
+
+    ExpRate = line_right / batch_size
+    word_scores = np.mean(word_scores)
+    return word_scores, ExpRate
+
 
 def draw_attention_map(image, attention):
     h, w = image.shape
