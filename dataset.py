@@ -255,7 +255,7 @@ def get_televic_dataset(params):
 
     print(f'Train dataset: {len(train_dataset)}, Train steps: {len(train_loader)} \n'
           f'Eval dataset: {len(eval_dataset)}, Eval steps: {len(eval_loader)}')
-    return train_loader, eval_loader
+    return train_loader, eval_loader, params
 
 
 def collate_fn(batch_images):

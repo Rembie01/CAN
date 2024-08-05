@@ -5,8 +5,8 @@ experiment: "CAN"
 seed: 20211024
 
 # train params
-epochs: 30
-batch_size: 1
+epochs: 20
+batch_size: 4
 workers: 1
 train_parts: 1
 valid_parts: 1
@@ -14,7 +14,7 @@ valid_start: 0
 save_start: 0
 
 optimizer: Adadelta
-lr: 1e-1
+lr: 1
 lr_decay: cosine
 step_ratio: 10
 step_decay: 5
@@ -31,7 +31,7 @@ use_label_mask: False
 invert_image: True
 
 # datapaths
-train_label_path: '/data/leuven/351/vsc35170/echmer/data/Televic/mathpix_processed_data/train.txt'
+train_label_path: '/data/leuven/351/vsc35170/echmer/data/MLHME-38K\train_set\train.txt'
 train_image_path: 'NA'
 
 eval_label_path: '/data/leuven/351/vsc35170/echmer/data/Televic/mathpix_processed_data/val.txt'
@@ -41,7 +41,6 @@ test_label_path: '/data/leuven/351/vsc35170/echmer/data/Televic/mathpix_processe
 test_image_path: 'NA'
 
 word_path: '/data/leuven/351/vsc35170/echmer/mlhme_dictionary.txt'
-
 # collate_fn
 collate_fn: collate_fn
 
@@ -78,7 +77,7 @@ whiten_type: None
 max_step: 256
 
 optimizer_save: False
-finetune: True
+finetune: False
 checkpoint_dir: 'checkpoints'
-checkpoint: 'CAN_2024-05-29-13-47_decoder-AttDecoder_WordRate-0.9196_ExpRate-0.4780_30.pth'
+checkpoint: ""
 log_dir: 'logs'

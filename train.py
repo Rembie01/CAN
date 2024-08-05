@@ -22,13 +22,22 @@ if __name__ == '__main__':
         exit(-1)
 
     if args.dataset == 'MLHME':
-        config_file = 'config_mlhme.yaml'
+        config_file = 'config_mlhme_.yaml'
     
     elif args.dataset =='MLHMED':
         config_file = 'config_mlhme_desktop.yaml'
     
+    elif args.dataset =='MLHMEVSC':
+        config_file = 'config_mlhme_vsc.yaml'
+    
     elif args.dataset == 'Televic':
         config_file = 'config_televic.yaml'
+    
+    elif args.dataset == 'TelevicD':
+        config_file = 'config_televic_desktop.yaml'
+    
+    elif args.dataset == 'TelevicVSC':
+        config_file = 'config_televic_vsc.yaml'
     
     else:
         print('Dataset not recognized')
@@ -52,11 +61,11 @@ if __name__ == '__main__':
     print('Using', device1, 'for DenseNet')
     print('Using', device2, 'for rest of network')
 
-    if args.dataset == 'MLHME' or args.dataset == 'MLHMED':
+    if args.dataset == 'MLHME' or args.dataset == 'MLHMED' or args.dataset == 'MLHMEVSC':
         train_loader, eval_loader, params = get_mlhme_dataset(params)
     
-    elif args.dataset == 'Televic':
-        train_loader, eval_loader = get_televic_dataset(params)
+    elif args.dataset == 'Televic' or args.dataset == 'TelevicD' or args.dataset == 'TelevicVSC':
+        train_loader, eval_loader, params = get_televic_dataset(params)
 
     model = CAN(params)
     now = time.strftime("%Y-%m-%d-%H-%M", time.localtime())
@@ -91,7 +100,7 @@ if __name__ == '__main__':
             print('Could not copy config')
 
     # Train
-    if args.dataset == 'MLHME' or args.dataset == 'MLHMED' or args.dataset == 'Televic':
+    if args.dataset == 'MLHME' or args.dataset == 'MLHMED' or args.dataset == 'Televic'or args.dataset == 'TelevicVSC':
         best_score, init_epoch = 0, 0
 
         print('Start training')
