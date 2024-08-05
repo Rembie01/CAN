@@ -50,7 +50,7 @@ class AttDecoder(nn.Module):
         self.out_channel = params['encoder']['out_channel']
         self.attention_dim = params['attention']['attention_dim']
         self.dropout_prob = params['dropout']
-        self.device = params['device']
+        self.device = params['device2']
         self.word_num = params['word_num']
         self.counting_num = params['counting_decoder']['out_channel']
 

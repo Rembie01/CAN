@@ -5,14 +5,14 @@ from utils import update_lr, Meter, cal_score
 
 def train(params, model, optimizer, epoch, train_loader, writer=None):
     model.train()
-    device = params['device']
+    device1 = params['device1']
+    device2 = params['device2']
     loss_meter = Meter()
     word_right, exp_right, length, cal_num = 0, 0, 0, 0
 
     with tqdm(train_loader, total=len(train_loader)//params['train_parts']) as pbar:
-        for batch_idx, (images, image_masks, labels, label_masks, _) in enumerate(pbar):
-            images, image_masks, labels, label_masks = images.to(device), image_masks.to(
-                device), labels.to(device), label_masks.to(device)
+        for batch_idx, (images, image_masks, labels, label_masks) in enumerate(pbar):
+            images, image_masks, labels, label_masks = images.to(device1), image_masks.to(device2), labels.to(device2), label_masks.to(device2)
             
             batch, time = labels.shape[:2]
             if not 'lr_decay' in params or params['lr_decay'] == 'cosine':
@@ -57,14 +57,15 @@ def train(params, model, optimizer, epoch, train_loader, writer=None):
 
 def eval(params, model, epoch, eval_loader, writer=None):
     model.eval()
-    device = params['device']
+    device1 = params['device1']
+    device2 = params['device2']
     loss_meter = Meter()
     word_right, exp_right, length, cal_num = 0, 0, 0, 0
 
     with tqdm(eval_loader, total=len(eval_loader)//params['valid_parts']) as pbar, torch.no_grad():
-        for batch_idx, (images, image_masks, labels, label_masks, _) in enumerate(pbar):
-            images, image_masks, labels, label_masks = images.to(device), image_masks.to(
-                device), labels.to(device), label_masks.to(device)
+        for batch_idx, (images, image_masks, labels, label_masks) in enumerate(pbar):
+            images, image_masks, labels, label_masks = images.to(device1), image_masks.to(device2), labels.to(device2), label_masks.to(device2)
+            
             batch, time = labels.shape[:2]
             probs, counting_preds, word_loss, counting_loss = model(images, image_masks, labels, label_masks, is_train=False)
             loss = word_loss + counting_loss

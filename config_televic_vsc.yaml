@@ -6,7 +6,7 @@ seed: 20211024
 
 # train params
 epochs: 30
-batch_size: 4
+batch_size: 1
 workers: 1
 train_parts: 1
 valid_parts: 1
@@ -14,7 +14,7 @@ valid_start: 0
 save_start: 0
 
 optimizer: Adadelta
-lr: 1
+lr: 1e-1
 lr_decay: cosine
 step_ratio: 10
 step_decay: 5
@@ -78,7 +78,7 @@ whiten_type: None
 max_step: 256
 
 optimizer_save: False
-finetune: False
+finetune: True
 checkpoint_dir: 'checkpoints'
-checkpoint: None
+checkpoint: 'CAN_2024-05-29-13-47_decoder-AttDecoder_WordRate-0.9196_ExpRate-0.4780_30.pth'
 log_dir: 'logs'
