@@ -7,7 +7,8 @@ import numpy as np
 from tensorboardX import SummaryWriter
 
 from utils import load_config, save_checkpoint, load_checkpoint
-from dataset2 import get_mlhme_dataset, get_crohme_dataset, get_televic_dataset
+from dataset_televic import get_televic_dataset
+from dataset2 import get_crohme_dataset, get_mlhme_dataset
 from models.can import CAN
 from training import train, eval
 
@@ -47,11 +48,14 @@ if __name__ == '__main__':
     torch.manual_seed(params['seed'])
     torch.cuda.manual_seed(params['seed'])
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    params['device'] = device
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+    device1 = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device2 = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+    params['device1'] = device1
+    params['device2'] = device2
 
-    print('Using', device)
+    print('Using', device1, 'for DenseNet')
+    print('Using', device2, 'for rest of network')
 
     if args.dataset == 'CROHME':
         train_loader, eval_loader, params = get_crohme_dataset(params)
@@ -67,7 +71,6 @@ if __name__ == '__main__':
     model.name = f'{params["experiment"]}_{now}_decoder-{params["decoder"]["net"]}'
 
     print('Model name:', model.name)
-    model = model.to(device)
 
     if args.no_check:
         writer = None

@@ -28,7 +28,7 @@ class TelevicDataset(Dataset):
         self.image_labels = []
         self.question_ids = []
         self.question_embeddings = []
-        self.image_root = Path(jsons_file).parent / 'jpg_files'
+        self.image_root = Path(jsons_file).parent / 'jpg_files_resized'
         self.json_root = Path(jsons_file).parent / 'mathpix_output_adjusted'
 
         with open(jsons_file, 'r', encoding='utf-8') as jsons:
@@ -44,8 +44,8 @@ class TelevicDataset(Dataset):
                 image_name = json_file.replace('.json', '.jpg')
                 self.image_paths.append(self.image_root / image_name)
         
-        combined_pattern = r'(\\sqrt)|(\\leftrightarrow)|(\\left\\{)|(\\left[\(\)\{\}\[\]\|.])|(\\left(\\rvert)?(\\lvert)?)|(\\right[\(\)\{\}\[\]\|.]?(\\rvert)?(\\lvert)?)|(\\text ?{([\w .?!,\)\()]+) ?})|(\\frac)|((\\[a-zA-Z]+)({[a-zA-Z~]+})?({[a-zA-Z\|]+})?)|([+-=*^_{}])|([\d\w])|(\\{2})|([\[\]\(\)\|\\&<>?!~%\"\'\&])'
-
+        combined_pattern = r'(\\ ?,)|(\\ ?{)|(\\ ?})|(\\ ?%)|(\\ ?\|)|(\\sqrt)|(\\leftrightarrow)|(\\left\\{)|(\\left[\(\)\{\}\[\]\|.]?(\\rvert)?(\\lvert)?)|(\\right[\(\)\{\}\[\]\|.]?(\\rvert)?(\\lvert)?)|(\\text ?{([\w .?!,\)\()]+) ?})|(\\frac)|((\\[a-zA-Z]+)({[a-zA-Z~]+})?({[a-zA-Z\|]+})?)|([+-=*^_{}])|([\d\w])|(\\{2})|([\[\]\(\)\|\\&<>?!~%\"\'\&])'
+        
         temp = []
         for label in self.image_labels:
             parts = re.findall(combined_pattern, label)
@@ -75,7 +75,7 @@ class TelevicDataset(Dataset):
         im.close()
         img = 1 - img
 
-        words, _ = self.words.encode2(labels)
+        words, _ = self.words.encode(labels)
         words = torch.LongTensor(words)
 
         return img, words
@@ -87,8 +87,8 @@ def get_televic_dataset(params):
     print(f"Train labels: {params['train_label_path']}")
     print(f"Eval labels: {params['eval_label_path']}")
 
-    train_dataset = TelevicDataset(params, params['train_label_path'], params['question_file'], words)
-    eval_dataset = TelevicDataset(params, params['eval_label_path'], params['question_file'], words)
+    train_dataset = TelevicDataset(params, params['train_label_path'], words)
+    eval_dataset = TelevicDataset(params, params['eval_label_path'], words)
 
     train_sampler = RandomSampler(train_dataset)
     eval_sampler = RandomSampler(eval_dataset)
@@ -292,21 +292,20 @@ class Words:
         altered = False
         for item in labels:
             try:
-                _ = self.words_dict[item]
-                label_index.append(item)
+                label_index.append(self.words_dict[item])
             except KeyError:
                 if item.startswith('\\begin{array}') or item == '\\begin{aligned}':
-                    label_index.append('\\begin{matrix}')
+                    label_index.append(self.words_dict['\\begin{matrix}'])
 
                 elif item == '\\end{array}' or item == '\\end{aligned}':
-                    label_index.append('\\end{matrix}')
+                    label_index.append(self.words_dict['\\end{matrix}'])
                 
                 elif item.startswith('\\text'):
                     text = re.findall(self.text_expression, item)
                     for character in text[0]:
                         try:
                             _ = self.words_dict[character]
-                            label_index.append(character)
+                            label_index.append(self.words_dict[character])
                         except KeyError:
                             if character == ' ':
                                 pass
@@ -318,7 +317,18 @@ class Words:
                     for character in text[0]:
                         try:
                             _ = self.words_dict[character]
-                            label_index.append(character)
+                            label_index.append(self.words_dict[character])
+                        except KeyError:
+                            if character == '~':
+                                pass
+                            else:
+                                raise KeyError
+                elif item.startswith('\\mathrm'):
+                    expression = r'{ ?([\w~]+) ?}'
+                    text = re.findall(expression, item)
+                    for character in text[0]:
+                        try:
+                            label_index.append(self.words_dict[character])
                         except KeyError:
                             if character == '~':
                                 pass
@@ -330,16 +340,54 @@ class Words:
                     label_index.append(self.words_dict['\\vec'])
                     label_index.append(self.words_dict['{'])
                     for character in text:
-                        print(character)
+                        try:
+                            label_index.append(self.words_dict[character])
+                        except KeyError:
+                            raise KeyError
+                    label_index.append(self.words_dict['}'])
+                elif item.startswith('\\hat'):
+                    expression = r'\\hat ?{ ?([\w]+) ?}'
+                    text = re.findall(expression, item)
+                    label_index.append(self.words_dict['\\hat'])
+                    label_index.append(self.words_dict['{'])
+                    for character in text:
                         try:
                             label_index.append(self.words_dict[character])
                         except KeyError:
                             print(character)
                             raise KeyError
                     label_index.append(self.words_dict['}'])
+                elif item == '\\ldots':
+                    label_index.append(self.words_dict['\\cdots'])
+                elif item == '\\left(' or item == '\\right(':
+                    label_index.append(self.words_dict['('])
+                elif item == '\\left)' or item == '\\right)':
+                    label_index.append(self.words_dict[')'])
+                elif item == '\\left|' or item == '\\right|' or item == '\\left\\rvert' or item == '\\right\\rvert' or item == '\\left\\lvert' or item == '\\right\\lvert':
+                    label_index.append(self.words_dict['|'])
+                elif item == '\\left.' or item == '\\right.':
+                    label_index.append(self.words_dict['.'])
+                elif item == '\\left[' or item == '\\right[':
+                    label_index.append(self.words_dict['['])
+                elif item == '\\left]' or item == '\\right]':
+                    label_index.append(self.words_dict[']'])
+                elif item == '\\left\\{':
+                    label_index.append(self.words_dict['\\{'])
+
+                elif item == '\\right' or item == '\\left':
+                    pass #formatting
+
+                elif item == '\\left\\lvert' or item == '\\right\\lvert':
+                    label_index.append(self.words_dict['\\lvert'])
+                elif item == '\\left\\rvert' or item == '\\right\\rvert':
+                    label_index.append(self.words_dict['\\rvert'])
+
+                elif item == '\\leqslant':
+                    label_index.append(self.words_dict['\\leq'])
+                elif item == '\\geqslant':
+                    label_index.append(self.words_dict['\\geq'])
                 else:
-                    altered = True
-                    label_index.append(item)
+                    raise ValueError(item, 'is not recognized in the dictionary', labels)
                 
         return label_index, altered
     

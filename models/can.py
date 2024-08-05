@@ -13,12 +13,12 @@ class CAN(nn.Module):
         super(CAN, self).__init__()
         self.params = params
         self.use_label_mask = params['use_label_mask']
-        self.encoder = DenseNet(params=self.params)
+        self.encoder = DenseNet(params=self.params).to(params['device1'])
         self.in_channel = params['counting_decoder']['in_channel']
         self.out_channel = params['word_num']
-        self.counting_decoder1 = counting_decoder(self.in_channel, self.out_channel, 3)
-        self.counting_decoder2 = counting_decoder(self.in_channel, self.out_channel, 5)
-        self.decoder = getattr(models, params['decoder']['net'])(params=self.params)
+        self.counting_decoder1 = counting_decoder(self.in_channel, self.out_channel, 3).to(params['device2'])
+        self.counting_decoder2 = counting_decoder(self.in_channel, self.out_channel, 5).to(params['device2'])
+        self.decoder = getattr(models, params['decoder']['net'])(params=self.params).to(params['device2'])
         self.cross = nn.CrossEntropyLoss(reduction='none') if self.use_label_mask else nn.CrossEntropyLoss()
         self.counting_loss = nn.SmoothL1Loss(reduction='mean')
 
@@ -29,11 +29,19 @@ class CAN(nn.Module):
         counting_mask = images_mask[:, :, ::self.ratio, ::self.ratio]
         counting_labels = gen_counting_label(labels, self.out_channel, True)
 
+        cnn_features = cnn_features.to(self.params['device2'])
+        counting_mask = counting_mask.to(self.params['device2'])
+        counting_labels = counting_labels.to(self.params['device2'])
+
         counting_preds1, _ = self.counting_decoder1(cnn_features, counting_mask)
         counting_preds2, _ = self.counting_decoder2(cnn_features, counting_mask)
         counting_preds = (counting_preds1 + counting_preds2) / 2
         counting_loss = self.counting_loss(counting_preds1, counting_labels) + self.counting_loss(counting_preds2, counting_labels) \
                         + self.counting_loss(counting_preds, counting_labels)
+        
+        labels = labels.to(self.params['device2'])
+        images_mask = images_mask.to(self.params['device2'])
+        labels_mask = labels_mask.to(self.params['device2'])
 
         word_probs, word_alphas = self.decoder(cnn_features, labels, counting_preds, images_mask, labels_mask, is_train=is_train)
         word_loss = self.cross(word_probs.contiguous().view(-1, word_probs.shape[-1]), labels.view(-1))

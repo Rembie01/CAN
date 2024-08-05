@@ -40,9 +40,9 @@ def load_config(yaml_path):
 
 def update_lr(optimizer, current_epoch, current_step, steps, epochs, initial_lr):
     if current_epoch < 1:
-        new_lr = initial_lr / steps * (current_step + 1)
+        new_lr = float(initial_lr) / steps * (current_step + 1)
     else:
-        new_lr = 0.5 * (1 + math.cos((current_step + 1 + (current_epoch - 1) * steps) * math.pi / (epochs * steps))) * initial_lr   
+        new_lr = 0.5 * (1 + math.cos((current_step + 1 + (current_epoch - 1) * steps) * math.pi / (epochs * steps))) * float(initial_lr)   
     for param_group in optimizer.param_groups:
         param_group['lr'] = new_lr
 
