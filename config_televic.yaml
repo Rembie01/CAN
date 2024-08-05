@@ -5,8 +5,8 @@ experiment: "CAN"
 seed: 20211024
 
 # train params
-epochs: 20
-batch_size: 4
+epochs: 30
+batch_size: 1
 workers: 1
 train_parts: 1
 valid_parts: 1
@@ -28,13 +28,19 @@ relu: True
 gradient: 100
 gradient_clip: True
 use_label_mask: False
+invert_image: True
 
 # datapaths
-train_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\MLHME-38K\train_set\train_labels_subset.txt'
+train_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\echmer\data\Televic\mathpix_processed_data\train.txt'
 train_image_path: 'NA'
 
-eval_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\MLHME-38K\train_set\train_labels_subset.txt'
+eval_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\echmer\data\Televic\mathpix_processed_data\val.txt'
 eval_image_path: 'NA'
+
+test_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\echmer\data\Televic\mathpix_processed_data\test.txt'
+test_image_path: 'NA'
+
+question_file: None
 
 word_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\mlhme_dictionary.txt'
 
@@ -76,5 +82,5 @@ max_step: 256
 optimizer_save: False
 finetune: False
 checkpoint_dir: 'checkpoints'
-checkpoint: ""
+checkpoint: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\CAN_2024-05-29-13-47_decoder-AttDecoder_WordRate-0.9196_ExpRate-0.4780_30.pth'
 log_dir: 'logs'

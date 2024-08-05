@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from utils import load_config, load_checkpoint, compute_edit_distance
 from models.infer_model_single import Inference
-from dataset2 import Words
+from dataset import Words
 from torchvision.transforms.functional import to_tensor
 
 if __name__ == '__main__':
@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    config_file = 'config_televic_desktop_test.yaml'
+    config_file = 'config_televic_test.yaml'
 
     """Config"""
     params = load_config(config_file)

@@ -7,8 +7,7 @@ import numpy as np
 from tensorboardX import SummaryWriter
 
 from utils import load_config, save_checkpoint, load_checkpoint
-from dataset_televic import get_televic_dataset
-from dataset2 import get_crohme_dataset, get_mlhme_dataset
+from dataset import get_mlhme_dataset, get_televic_dataset
 from models.can import CAN
 from training import train, eval
 
@@ -22,18 +21,14 @@ if __name__ == '__main__':
         print('No dataset specified')
         exit(-1)
 
-    if args.dataset == 'CROHME':
-        config_file = 'config.yaml'
-
-    elif args.dataset == 'MLHME':
+    if args.dataset == 'MLHME':
         config_file = 'config_mlhme.yaml'
     
     elif args.dataset =='MLHMED':
         config_file = 'config_mlhme_desktop.yaml'
     
     elif args.dataset == 'Televic':
-        from dataset_televic import get_televic_dataset
-        config_file = 'config_televic_vsc.yaml'
+        config_file = 'config_televic.yaml'
     
     else:
         print('Dataset not recognized')
@@ -57,10 +52,7 @@ if __name__ == '__main__':
     print('Using', device1, 'for DenseNet')
     print('Using', device2, 'for rest of network')
 
-    if args.dataset == 'CROHME':
-        train_loader, eval_loader, params = get_crohme_dataset(params)
-
-    elif args.dataset == 'MLHME' or args.dataset == 'MLHMED':
+    if args.dataset == 'MLHME' or args.dataset == 'MLHMED':
         train_loader, eval_loader, params = get_mlhme_dataset(params)
     
     elif args.dataset == 'Televic':
@@ -99,7 +91,7 @@ if __name__ == '__main__':
             print('Could not copy config')
 
     # Train
-    if args.dataset == 'CROHME' or args.dataset == 'MLHME' or args.dataset == 'MLHMED' or args.dataset == 'Televic':
+    if args.dataset == 'MLHME' or args.dataset == 'MLHMED' or args.dataset == 'Televic':
         best_score, init_epoch = 0, 0
 
         print('Start training')

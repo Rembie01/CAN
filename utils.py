@@ -105,21 +105,17 @@ def cal_score(word_probs, word_label, mask):
     word_scores = np.mean(word_scores)
     return word_scores, ExpRate
 
-def cal_score2(word_probs, word_label):
+def cal_score2(prediction, ground_truth):
+    prediction = [item.item() for item in prediction]
+    ground_truth = ground_truth.numpy()
     line_right = 0
-    if word_probs is not None:
-        _, word_pred = word_probs.max(2)
-    word_scores = [SequenceMatcher(None, s1[:int(len(s1))], s2[:int(len(s1))], autojunk=False).ratio() * (len(s1[:int(len(s1))]) + len(s2[:int(len(s1))])) / len(s1[:int(len(s1))]) / 2
-              for s1, s2 in zip(word_label.cpu().detach().numpy(), word_pred.cpu().detach().numpy())]
+    word_score = SequenceMatcher(None, prediction[:int(len(ground_truth))], ground_truth[:int(len(ground_truth))], autojunk=False).ratio() * (len(prediction[:int(len(ground_truth))]) + len(ground_truth[:int(len(ground_truth))])) / len(prediction[:int(len(ground_truth))]) / 2
     
-    batch_size = len(word_scores)
-    for i in range(batch_size):
-        if word_scores[i] == 1:
-            line_right += 1
+    if word_score == 1:
+        line_right += 1
 
-    ExpRate = line_right / batch_size
-    word_scores = np.mean(word_scores)
-    return word_scores, ExpRate
+    ExpRate = line_right
+    return word_score, ExpRate
 
 
 def draw_attention_map(image, attention):
