@@ -31,16 +31,16 @@ use_label_mask: False
 invert_image: True
 
 # datapaths
-train_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\echmer\data\Televic\mathpix_processed_data\train.txt'
+train_label_path: 'D:\Masterproef\echmer\data\Televic\mathpix_processed_data\test.txt'
 train_image_path: 'NA'
 
-eval_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\echmer\data\Televic\mathpix_processed_data\val.txt'
+eval_label_path: 'D:\Masterproef\echmer\data\Televic\mathpix_processed_data\val.txt'
 eval_image_path: 'NA'
 
-test_label_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\echmer\data\Televic\mathpix_processed_data\test.txt'
+test_label_path: 'D:\Masterproef\echmer\data\Televic\mathpix_processed_data\test.txt'
 test_image_path: 'NA'
 
-word_path: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\mlhme_dictionary.txt'
+word_path: 'D:\Masterproef\echmer\televic_dictionary.txt'
 
 # collate_fn
 collate_fn: collate_fn
@@ -65,7 +65,7 @@ decoder:
 # out_channel should be equal to the amount of symbols in the dictionary
 counting_decoder:
   in_channel: 684
-  out_channel: 206
+  out_channel: 193
 
 attention:
   attention_dim: 512
@@ -80,5 +80,5 @@ max_step: 256
 optimizer_save: False
 finetune: False
 checkpoint_dir: 'checkpoints'
-checkpoint: 'C:\Users\REM\OneDrive - Televic Group NV\Documents\CAN_test\CAN_2024-05-29-13-47_decoder-AttDecoder_WordRate-0.9196_ExpRate-0.4780_30.pth'
+checkpoint: 'D:\Masterproef\CAN\checkpoints\CAN_2024-07-26-17-56_decoder-AttDecoder-televic-dataset-televic-dict\CAN_2024-07-26-17-56_decoder-AttDecoder_WordRate-0.2568_ExpRate-0.0000_22.pth'
 log_dir: 'logs'

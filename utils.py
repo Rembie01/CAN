@@ -107,7 +107,7 @@ def cal_score(word_probs, word_label, mask):
 
 def cal_score2(prediction, ground_truth):
     prediction = [item.item() for item in prediction]
-    ground_truth = ground_truth.numpy()
+    ground_truth = ground_truth.cpu().numpy()
     line_right = 0
     word_score = SequenceMatcher(None, prediction[:int(len(ground_truth))], ground_truth[:int(len(ground_truth))], autojunk=False).ratio() * (len(prediction[:int(len(ground_truth))]) + len(ground_truth[:int(len(ground_truth))])) / len(prediction[:int(len(ground_truth))]) / 2
     
